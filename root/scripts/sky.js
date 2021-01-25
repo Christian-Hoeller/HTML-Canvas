@@ -1,13 +1,13 @@
 const canvas = document.getElementById('sky');
 const context = canvas.getContext('2d');
 
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    console.log("resize")
 
     init();
 });
@@ -16,20 +16,7 @@ window.addEventListener('click', () => {
     rocket = new Rocket(canvas.width / 2, canvas.height);
 });
 
-// window.addEventListener('mousemove', (event) => {
-//     mouse.x = event.x;
-//     mouse.y = event.y;
-
-//     rocket = new Rocket(mouse.x, mouse.y);
-// })
-
-// let mouse = {
-//     x: undefined,
-//     y: undefined
-// }
-
 let sizingFactor = 0.01;
-
 function Star(x, y, radius) {
     this.x = x;
     this.y = y;
@@ -157,7 +144,6 @@ function Rocket(x, y) {
             'gold',
             'darkred',
             'darkorange',
-
        ]
     
         for (let i = 0; i < 18; i++) {
@@ -177,14 +163,14 @@ function Rocket(x, y) {
 
     this.update = () => {
 
-        this.y -= 3;
+        this.y -= 6;
         if (this.y < -500) this.y = canvas.height;
         this.draw();
     }
 }
 
 let stars = [];
-let rocket = new Rocket(canvas.width / 2, canvas.height / 2);
+let rocket;
 
 const init = () => {
     stars = [];
@@ -196,10 +182,10 @@ const init = () => {
         const star = new Star(x, y, radius);
         stars.push(star);
     }
+    rocket = new Rocket(canvas.width / 2, canvas.height);
 
     context.fillStyle = '#000612';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    
 }
 
 

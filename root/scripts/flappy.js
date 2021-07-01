@@ -9,6 +9,7 @@ canvas.height = height;
 
 let player;
 let obstacles = [];
+let score = 0;
 
 //gameState
 let gameOver = false;
@@ -29,12 +30,37 @@ function Player(x, y, radius){
 
     this.checkCollision = () => {
 
-        //check upper collision
+        //upper / lower screen collisions
         let lowerCollision = this.y + this.radius >= height;
         let upperCollision = this.y - this.radius <= 0;
-        
+
+        //obstacle collisions
+
+        for(let i = 0; i < obstacles.length; i++){
+            
+            let temp = this.x + this.radius;
+            if(temp > obstacles[i].x && temp < obstacles[i].x + obstacles[i].width){
+                console.log("between");
+                let upperEdge = obstacles[i].obstacleInfo.upperEdge;
+                let lowerEdge = obstacles[i].obstacleInfo.lowerEdge;
+
+                let upperEdgeCollision = this.y - this.radius < upperEdge;
+                let lowerEdgeCollision = this.y + this.radius > lowerEdge;
+
+
+                if(upperEdgeCollision || lowerEdgeCollision){
+                    console.log("collision")
+                    gameOver = true;
+                }
+            }
+        }
+
+
+
         if(lowerCollision || upperCollision){
             let collisionPosition = lowerCollision ? "bottom" : "top";
+            console.log(collisionPosition);
+            console.log(obstacles[0].obstacleInfo.upperEdge)
             gameOver = true;
         }
     }
@@ -68,6 +94,8 @@ function Obstacle(x, obstacleWidth){
     this.x = x;
     this.width = obstacleWidth;
 
+    this.countedAsScore = false;
+
     this.getRandomHeight = () => {
         return Math.random() * (height - this.gap - 2 * this.maxHeight) +  this.maxHeight;
     }
@@ -76,9 +104,20 @@ function Obstacle(x, obstacleWidth){
     this.gap = height / 5;
     this.height = this.getRandomHeight();
 
+    this.obstacleInfo = {
+        upperEdge: this.height,
+        lowerEdge: this.height + this.gap
+    }
+
+    this.updateScore = () => {
+        if(this.x + this.width < player.x && !this.countedAsScore){
+            score++;
+            document.getElementById("score").innerHTML = `score: ${score}`;
+            this.countedAsScore = true;
+        }
+    }
+
     this.draw = () => {
-
-
         //upper rect
         context.beginPath();
         context.rect(this.x, 0, this.width, this.height);
@@ -93,6 +132,7 @@ function Obstacle(x, obstacleWidth){
     this.update = () => {
         if(this.x + this.width < 0){
             this.x = width;
+            this.countedAsScore = false;
 
             //get random value
             this.height = this.getRandomHeight();
@@ -100,10 +140,6 @@ function Obstacle(x, obstacleWidth){
 
         this.x -= this.moveSpeed;
     }
-
-   
-
-   
 }
 
 
@@ -131,6 +167,7 @@ const animate = () => {
         for(let i = 0; i < obstacles.length; i++){
             obstacles[i].draw();
             obstacles[i].update();
+            obstacles[i].updateScore();
         }
     }
     else{
